@@ -43,9 +43,34 @@ export function PDFViewer({ documentId }: PDFViewerProps) {
         );
     }
 
+    // Detect mobile devices
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
     // Append page number hash to URL to force jumps
     // Chrome's PDF viewer handles hash changes (#page=N).
     const displayUrl = currentPage ? `${url}#page=${currentPage}` : url;
+
+    if (isMobile) {
+        return (
+            <div className="flex flex-col h-full items-center justify-center bg-slate-900 border-r border-slate-800 p-6 text-center space-y-6">
+                <div className="w-20 h-20 bg-primary-500/10 rounded-2xl flex items-center justify-center">
+                    <Loader2 className="w-10 h-10 text-primary-500 animate-pulse" />
+                </div>
+                <div className="max-w-xs space-y-2">
+                    <h3 className="text-lg font-semibold text-white">PDF Ready</h3>
+                    <p className="text-sm text-slate-400">
+                        Since you're on a mobile device, please open the PDF in a new tab to view it comfortably.
+                    </p>
+                </div>
+                <button
+                    onClick={() => window.open(url, '_blank')}
+                    className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-medium shadow-lg shadow-primary-500/20 transition-all active:scale-95"
+                >
+                    Open PDF
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="h-full w-full bg-slate-900 border-r border-slate-800">
