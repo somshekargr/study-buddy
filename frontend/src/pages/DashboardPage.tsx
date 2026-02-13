@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useTheme } from '../contexts/ThemeContext';
+import { useNavigate } from 'react-router-dom';
 import { UploadZone } from '../components/UploadZone';
 import { DocumentList } from '../components/DocumentList';
 import { Button } from '../components/ui/Button';
@@ -12,6 +13,7 @@ export function DashboardPage() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const [showSettings, setShowSettings] = useState(false);
     const settingsRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
 
     const handleUploadComplete = () => {
         setRefreshTrigger(prev => prev + 1);
@@ -138,7 +140,7 @@ export function DashboardPage() {
                         <div className="relative group">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-violet-500 to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition-all duration-500" />
                             <button
-                                onClick={() => window.location.href = '/study/general'}
+                                onClick={() => navigate('/study/general')}
                                 className="relative w-full h-full bg-white dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-gray-200 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 text-left flex flex-col justify-between gap-4"
                             >
                                 <div className="space-y-3">
