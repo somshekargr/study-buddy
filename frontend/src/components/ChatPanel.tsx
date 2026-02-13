@@ -127,10 +127,16 @@ export function ChatPanel({ documentId }: ChatPanelProps) {
             let assistantMessage = '';
             let rawBuffer = '';
             let citationsParsed = false;
+            let firstChunk = true;
 
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
+
+                if (firstChunk) {
+                    setLoading(false);
+                    firstChunk = false;
+                }
 
                 const chunk = decoder.decode(value);
                 rawBuffer += chunk;
