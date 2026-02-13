@@ -119,7 +119,13 @@ Edit `backend/.env` and fill in the required values:
 cp frontend/.env.example frontend/.env
 ```
 
-Set `VITE_GOOGLE_CLIENT_ID` to the same Google OAuth client ID.
+Set the following variables in `frontend/.env`:
+
+| Variable | Description |
+|---|---|
+| `VITE_GOOGLE_CLIENT_ID` | Google OAuth client ID |
+| `VITE_API_URL` | Base URL for the backend API (e.g., `http://localhost:8000/api` or ngrok URL) |
+| `VITE_SUPPORT_EMAIL` | (Optional) Support email shown on fallback screens |
 
 ### 2. Start Infrastructure
 
@@ -151,6 +157,39 @@ npm run dev
 ```
 
 Visit **http://localhost:5173** to start studying!
+
+---
+
+## 🌐 Deployment
+
+Study Buddy is configured for a hybrid deployment model:
+- **Frontend**: Hosted on **GitHub Pages** (automatically via GitHub Actions).
+- **Backend**: Hosted on your **Local Machine** and exposed via **ngrok**.
+
+### 1. Backend Connectivity (ngrok)
+To allow the GitHub Pages frontend to reach your local backend:
+1.  Install [ngrok](https://ngrok.com/).
+2.  Run the backend locally (port 8000).
+3.  Expose it: `ngrok http 8000`.
+4.  Copy the `https://...` URL provided by ngrok.
+
+### 2. GitHub Secrets
+In your GitHub repository settings, add the following **Actions Secrets**:
+- `VITE_API_URL`: Your ngrok URL (e.g., `https://random-id.ngrok-free.app/api`).
+- `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth Client ID.
+- `VITE_SUPPORT_EMAIL`: Your support contact (e.g., `study1997buddy@gmail.com`).
+
+### 3. Automated CI/CD
+Every push to the `master` branch triggers the `.github/workflows/deploy.yml` workflow, which builds the React app with your secrets and deploys it to the `gh-pages` branch.
+
+---
+
+## 🛡️ Backend Health Monitoring
+
+The frontend includes a built-in health monitor:
+- **Detection**: Every 30 seconds, the app checks if the backend API is reachable.
+- **Fallback UI**: If the ngrok tunnel or local server is down, a premium "Server Connection Lost" screen appears automatically.
+- **Auto-Recovery**: As soon as the backend is restored, the app detects it and returns to the dashboard without a refresh.
 
 ---
 
