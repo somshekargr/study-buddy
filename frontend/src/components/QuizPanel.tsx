@@ -27,8 +27,6 @@ export function QuizPanel({ documentId }: QuizPanelProps) {
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [isAnswered, setIsAnswered] = useState(false);
 
-    const token = useAuthStore((state) => state.token);
-
     const generateQuiz = async () => {
         setLoading(true);
         try {

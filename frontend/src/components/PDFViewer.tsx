@@ -9,7 +9,6 @@ interface PDFViewerProps {
 }
 
 export function PDFViewer({ documentId }: PDFViewerProps) {
-    const token = useAuthStore((state) => state.token);
     const currentPage = useStudyStore((state) => state.currentPage);
     const [url, setUrl] = useState<string | null>(null);
 
@@ -28,14 +27,14 @@ export function PDFViewer({ documentId }: PDFViewerProps) {
             }
         };
 
-        if (documentId && token) {
+        if (documentId) {
             fetchPdf();
         }
 
         return () => {
             if (url) URL.revokeObjectURL(url);
         };
-    }, [documentId, token]);
+    }, [documentId]);
 
     if (!url) {
         return (
