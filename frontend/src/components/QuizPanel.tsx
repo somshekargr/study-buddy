@@ -135,15 +135,15 @@ export function QuizPanel({ documentId }: QuizPanelProps) {
 
                 <div className="space-y-3">
                     {currentQuestion.options.map((option, idx) => {
-                        let className = "justify-start text-left h-auto py-3 px-4 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white";
+                        let className = "justify-start text-left h-auto py-3 px-4 border-gray-200 dark:border-slate-700 text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 hover:text-gray-900 dark:hover:text-white whitespace-normal";
 
                         if (isAnswered) {
                             if (idx === currentQuestion.correct_answer) {
-                                className = "justify-start text-left h-auto py-3 px-4 border-green-500/50 bg-green-500/10 text-green-400";
+                                className = "justify-start text-left h-auto py-3 px-4 border-green-500/50 bg-green-500/10 text-green-400 whitespace-normal";
                             } else if (idx === selectedOption) {
-                                className = "justify-start text-left h-auto py-3 px-4 border-red-500/50 bg-red-500/10 text-red-600 dark:text-red-400";
+                                className = "justify-start text-left h-auto py-3 px-4 border-red-500/50 bg-red-500/10 text-red-600 dark:text-red-400 whitespace-normal";
                             } else {
-                                className = "justify-start text-left h-auto py-3 px-4 border-gray-100 dark:border-slate-800 opacity-50";
+                                className = "justify-start text-left h-auto py-3 px-4 border-gray-100 dark:border-slate-800 opacity-50 whitespace-normal";
                             }
                         }
 
@@ -155,16 +155,16 @@ export function QuizPanel({ documentId }: QuizPanelProps) {
                                 onClick={() => handleOptionSelect(idx)}
                                 disabled={isAnswered}
                             >
-                                <div className="flex items-center w-full">
-                                    <span className="w-6 h-6 rounded-full border border-current flex items-center justify-center text-xs mr-3 shrink-0">
+                                <div className="flex items-start w-full gap-3">
+                                    <span className="w-6 h-6 rounded-full border border-current flex items-center justify-center text-xs shrink-0 mt-0.5">
                                         {String.fromCharCode(65 + idx)}
                                     </span>
-                                    <span>{option}</span>
+                                    <span className="flex-1 text-left leading-relaxed">{option}</span>
                                     {isAnswered && idx === currentQuestion.correct_answer && (
-                                        <CheckCircle className="w-4 h-4 ml-auto text-green-400" />
+                                        <CheckCircle className="w-4 h-4 shrink-0 mt-1 ml-auto text-green-400" />
                                     )}
                                     {isAnswered && idx === selectedOption && idx !== currentQuestion.correct_answer && (
-                                        <XCircle className="w-4 h-4 ml-auto text-red-400" />
+                                        <XCircle className="w-4 h-4 shrink-0 mt-1 ml-auto text-red-400" />
                                     )}
                                 </div>
                             </Button>
