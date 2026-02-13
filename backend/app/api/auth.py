@@ -42,7 +42,7 @@ async def google_login(request: GoogleLoginRequest, db: AsyncSession = Depends(g
         user_id=user.id,
         full_name=user.full_name,
         email=user.email,
-        theme_preference=user.theme_preference
+        theme_preference=user.theme_preference or "system"
     )
 
 from pydantic import BaseModel

@@ -40,6 +40,8 @@ app = FastAPI(
     description="GenAI-native educational web app for personalized learning.",
     version="0.1.0",
     lifespan=lifespan,
+    docs_url=None if settings.ENVIRONMENT == "production" else "/docs",
+    redoc_url=None if settings.ENVIRONMENT == "production" else "/redoc",
 )
 
 # CORS Middleware
@@ -48,8 +50,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "https://somshekargr.github.io",
-        "*"
-    ],  # Adjust in production
+    ],  # Explicit origins only, no wildcard
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

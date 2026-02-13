@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 class Settings(BaseSettings):
+    ENVIRONMENT: str = "production"  # development | production
     # Database
     DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/studybuddy"
 
