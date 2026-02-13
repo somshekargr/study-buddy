@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useStudyStore } from '../stores/useStudyStore';
+import api from '../services/api';
 
 interface PDFViewerProps {
     documentId: string;
@@ -15,16 +16,12 @@ export function PDFViewer({ documentId }: PDFViewerProps) {
     useEffect(() => {
         const fetchPdf = async () => {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/documents/${documentId}/content`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                // Using axios instance instead of raw fetch to get ngrok-skip-browser-warning header
+                const response = await api.get(`/documents/${documentId}/content`, {
+                    responseType: 'blob'
                 });
 
-                if (!response.ok) throw new Error('Failed to load PDF');
-
-                const blob = await response.blob();
-                const objectUrl = URL.createObjectURL(blob);
+                const objectUrl = URL.createObjectURL(response.data);
                 setUrl(objectUrl);
             } catch (error) {
                 console.error('Error loading PDF:', error);

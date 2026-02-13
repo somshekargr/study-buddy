@@ -4,6 +4,7 @@ import { Button } from './ui/Button';
 import { Card } from './ui/Card';
 import { useAuthStore } from '../stores/useAuthStore';
 import { cn } from '../lib/utils';
+import api from '../services/api';
 
 interface QuizQuestion {
     question: string;
@@ -31,18 +32,12 @@ export function QuizPanel({ documentId }: QuizPanelProps) {
     const generateQuiz = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/quiz/generate`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ document_id: documentId, num_questions: 5 }),
+            const response = await api.post('/quiz/generate', {
+                document_id: documentId,
+                num_questions: 5
             });
 
-            if (!response.ok) throw new Error('Failed to generate quiz');
-
-            const data = await response.json();
+            const data = response.data;
             setQuestions(data.questions || []);
             setStarted(true);
             setCurrentIndex(0);
