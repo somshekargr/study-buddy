@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Loader2, CheckCircle, XCircle, Trophy, RefreshCw } from 'lucide-react';
 import { Button } from './ui/Button';
 import { Card } from './ui/Card';
-import { useAuthStore } from '../stores/useAuthStore';
 import { cn } from '../lib/utils';
 import api from '../services/api';
 

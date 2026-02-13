@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import { useAuthStore } from '../stores/useAuthStore';
 import { useStudyStore } from '../stores/useStudyStore';
 import api from '../services/api';
 
