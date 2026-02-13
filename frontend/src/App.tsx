@@ -15,10 +15,17 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './components/ui/Toast';
+import { BackendHealthProvider, useBackendHealth } from './components/BackendHealthCheck';
+import { ServerDownScreen } from './components/ServerDownScreen';
 import { Loader2 } from 'lucide-react';
 
-function App() {
+function AppContent() {
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
+  const { isBackendDown } = useBackendHealth();
+
+  if (isBackendDown) {
+    return <ServerDownScreen />;
+  }
 
   if (!hasHydrated) {
     return (
@@ -30,31 +37,39 @@ function App() {
   }
 
   return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <DashboardPage />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/study/:documentId"
+        element={
+          <PrivateRoute>
+            <StudyPage />
+          </PrivateRoute>
+        }
+      />
+      {/* Catch all */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+function App() {
+  return (
     <ThemeProvider>
       <ToastProvider>
-        <ErrorBoundary>
-          <Routes>
-            <Route path="/login" element={<LoginPage />} />
-            <Route
-              path="/"
-              element={
-                <PrivateRoute>
-                  <DashboardPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/study/:documentId"
-              element={
-                <PrivateRoute>
-                  <StudyPage />
-                </PrivateRoute>
-              }
-            />
-            {/* Catch all */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </ErrorBoundary>
+        <BackendHealthProvider>
+          <ErrorBoundary>
+            <AppContent />
+          </ErrorBoundary>
+        </BackendHealthProvider>
       </ToastProvider>
     </ThemeProvider>
   );
