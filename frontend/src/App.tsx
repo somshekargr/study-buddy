@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/useAuthStore';
 import { LoginPage } from './pages/LoginPage';
@@ -22,6 +23,11 @@ import { Loader2 } from 'lucide-react';
 function AppContent() {
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const { isBackendDown } = useBackendHealth();
+
+  useEffect(() => {
+    console.log('🚀 Study Buddy started');
+    console.log('📡 API URL:', import.meta.env.VITE_API_URL || 'http://localhost:8000/api');
+  }, []);
 
   if (isBackendDown) {
     return <ServerDownScreen />;
