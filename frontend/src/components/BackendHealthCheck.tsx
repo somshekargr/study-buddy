@@ -18,7 +18,12 @@ export const BackendHealthProvider: React.FC<{ children: React.ReactNode }> = ({
     const checkHealth = useCallback(async () => {
         try {
             // Use a short timeout so the UI doesn't hang
-            await axios.get(HEALTH_ENDPOINT, { timeout: 3000 });
+            await axios.get(HEALTH_ENDPOINT, {
+                timeout: 3000,
+                headers: {
+                    'ngrok-skip-browser-warning': 'true'
+                }
+            });
             setIsBackendDown(false);
         } catch (error) {
             console.warn('Backend health check failed:', error);
