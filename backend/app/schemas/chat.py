@@ -1,7 +1,7 @@
 
 from uuid import UUID
 from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, model_validator
 from enum import Enum
 
 class MessageRole(str, Enum):
@@ -23,16 +23,32 @@ class ChatMessageResponse(ChatMessageBase):
     citations: list[dict] | None = None # Change to list of dicts
     created_at: datetime
 
+    @model_validator(mode='before')
     @classmethod
-    def from_orm(cls, obj):
+    def parse_citations(cls, data):
         import json
-        instance = super().from_orm(obj)
-        if isinstance(obj.citations, str) and obj.citations.strip():
+        if hasattr(data, "citations") and isinstance(data.citations, str) and data.citations.strip():
             try:
-                instance.citations = json.loads(obj.citations)
+                # We need to convert the object to a dict to modify it, or just return a new dict
+                # But since this is 'before', data might be the SQLAlchemy model
+                citations_raw = data.citations
+                parsed_citations = json.loads(citations_raw)
+                # However, modifying the SQLAlchemy model is not ideal.
+                # Better to return a dict that Pydantic can use.
+                
+                # Convert SQLAlchemy model to dict if attributes are accessible
+                result = {
+                    "id": data.id,
+                    "session_id": data.session_id,
+                    "role": data.role,
+                    "content": data.content,
+                    "citations": parsed_citations,
+                    "created_at": data.created_at
+                }
+                return result
             except:
-                instance.citations = []
-        return instance
+                pass
+        return data
 
     model_config = ConfigDict(from_attributes=True)
 
