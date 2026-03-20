@@ -25,13 +25,16 @@ export function QuizPanel({ documentId }: QuizPanelProps) {
     const [showResult, setShowResult] = useState(false);
     const [selectedOption, setSelectedOption] = useState<number | null>(null);
     const [isAnswered, setIsAnswered] = useState(false);
+    const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
+    const [numQuestions, setNumQuestions] = useState<number>(5);
 
     const generateQuiz = async () => {
         setLoading(true);
         try {
             const response = await api.post('/quiz/generate', {
                 document_id: documentId,
-                num_questions: 5
+                num_questions: numQuestions,
+                difficulty: difficulty
             });
 
             const data = response.data;
@@ -74,7 +77,7 @@ export function QuizPanel({ documentId }: QuizPanelProps) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-slate-400 gap-4">
                 <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
-                <p>Generating your quiz...</p>
+                <p>Generating your {difficulty} difficulty quiz...</p>
             </div>
         );
     }
@@ -86,11 +89,53 @@ export function QuizPanel({ documentId }: QuizPanelProps) {
                     <Trophy className="w-8 h-8 text-primary-600 dark:text-primary-500" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Test Your Knowledge</h2>
-                <p className="text-gray-600 dark:text-slate-400 max-w-md">
-                    Generate a 5-question multiple choice quiz based on this document to test your understanding.
-                </p>
-                <Button onClick={generateQuiz} size="lg" className="w-full max-w-xs">
-                    Start Quiz
+
+                <div className="w-full max-w-sm space-y-6 text-left">
+                    {/* Difficulty Selection */}
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Difficulty</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {(['easy', 'medium', 'hard'] as const).map((level) => (
+                                <button
+                                    key={level}
+                                    onClick={() => setDifficulty(level)}
+                                    className={cn(
+                                        "px-3 py-2 rounded-lg text-sm font-medium border transition-all capitalize",
+                                        difficulty === level
+                                            ? "bg-primary-500 border-primary-500 text-white shadow-lg shadow-primary-500/20"
+                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary-400"
+                                    )}
+                                >
+                                    {level}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Question Count Selection */}
+                    <div className="space-y-3">
+                        <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Number of Questions</label>
+                        <div className="grid grid-cols-3 gap-2">
+                            {[5, 10, 20].map((count) => (
+                                <button
+                                    key={count}
+                                    onClick={() => setNumQuestions(count)}
+                                    className={cn(
+                                        "px-3 py-2 rounded-lg text-sm font-medium border transition-all",
+                                        numQuestions === count
+                                            ? "bg-primary-500 border-primary-500 text-white shadow-lg shadow-primary-500/20"
+                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary-400"
+                                    )}
+                                >
+                                    {count}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <Button onClick={generateQuiz} size="lg" className="w-full max-w-sm mt-4">
+                    Generate Quiz
                 </Button>
             </div>
         );
@@ -108,7 +153,7 @@ export function QuizPanel({ documentId }: QuizPanelProps) {
                     {score === questions.length ? "Perfect score! You're a master." :
                         score > questions.length / 2 ? "Great job! Keep studying." : "Keep practicing!"}
                 </p>
-                <Button onClick={generateQuiz} variant="outline" className="gap-2">
+                <Button onClick={() => setStarted(false)} variant="outline" className="gap-2">
                     <RefreshCw className="w-4 h-4" /> Try Again
                 </Button>
             </div>

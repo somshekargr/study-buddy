@@ -20,11 +20,23 @@ class LLMService:
             if token:
                 yield token
 
-    async def generate_quiz(self, context: str, num_questions: int = 5) -> list[dict]:
+    async def generate_quiz(
+        self, 
+        context: str, 
+        num_questions: int = 5, 
+        difficulty: str = "medium"
+    ) -> list[dict]:
         """Generates a multiple-choice quiz from the provided context in JSON format."""
         
         system_prompt = f"""You are a helpful study assistant. 
         Generate {num_questions} multiple-choice questions based on the provided text.
+        Difficulty Level: {difficulty.upper()}.
+        
+        Guidelines for Difficulty:
+        - EASY: Direct facts, definitions, and basic comprehension.
+        - MEDIUM: Application of concepts, relationship between ideas.
+        - HARD: Complex analysis, synthesis, and deep inferential questions.
+        
         Return the result as a STRICT JSON array of objects.
         
         The JSON format must be exactly:
@@ -40,7 +52,7 @@ class LLMService:
         Do not output any markdown formatting like ```json or ```. Just the raw JSON string.
         """
 
-        user_prompt = f"Context:\n{context}\n\nGenerate {num_questions} questions."
+        user_prompt = f"Context:\n{context}\n\nGenerate {num_questions} {difficulty} difficulty questions."
 
         try:
             response = await self.client.chat.completions.create(

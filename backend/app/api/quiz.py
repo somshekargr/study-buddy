@@ -17,6 +17,7 @@ router = APIRouter()
 class QuizRequest(BaseModel):
     document_id: uuid.UUID
     num_questions: int = 5
+    difficulty: str = "medium"
 
 class QuizQuestion(BaseModel):
     question: str
@@ -44,8 +45,14 @@ async def generate_quiz(
         raise HTTPException(status_code=403, detail="Not authorized")
 
     # 2. Select random chunks (Postgres-specific RANDOM())
-    # Limiting to 5 chunks to keep context window manageable while geting variety
-    query = select(DocumentChunk).where(DocumentChunk.document_id == request.document_id).order_by(func.random()).limit(5)
+    # Scale context based on requested number of questions
+    chunk_limit = 5 if request.num_questions <= 5 else 10 if request.num_questions <= 10 else 15
+    query = (
+        select(DocumentChunk)
+        .where(DocumentChunk.document_id == request.document_id)
+        .order_by(func.random())
+        .limit(chunk_limit)
+    )
     result = await db.execute(query)
     chunks = result.scalars().all()
     
@@ -56,6 +63,10 @@ async def generate_quiz(
     context_text = "\n\n".join([c.content for c in chunks])
     
     # 4. Generate Quiz
-    questions_data = await llm_service.generate_quiz(context_text, request.num_questions)
+    questions_data = await llm_service.generate_quiz(
+        context_text, 
+        request.num_questions,
+        request.difficulty
+    )
     
     return {"questions": questions_data}
