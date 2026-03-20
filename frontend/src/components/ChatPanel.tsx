@@ -7,10 +7,16 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { cn } from '../lib/utils';
 import ReactMarkdown from 'react-markdown';
 
+interface Citation {
+    page_number: number | string;
+    content: string;
+    source_name: string;
+}
+
 interface Message {
     role: 'user' | 'assistant';
     content: string;
-    citations?: number[];
+    citations?: Citation[];
 }
 
 interface ChatSession {
@@ -340,37 +346,86 @@ export function ChatPanel({ documentId }: ChatPanelProps) {
                             </p>
                         </div>
                     )}
-                    {messages.map((msg, i) => (
-                        <div
-                            key={i}
-                            className={cn(
-                                "flex w-full",
-                                msg.role === 'user' ? "justify-end" : "justify-start"
-                            )}
-                        >
+                    {messages.map((msg, i) => {
+                        const hasThought = msg.content.includes('<thought>') && msg.content.includes('</thought>');
+                        let thought = '';
+                        let mainContent = msg.content;
+
+                        if (hasThought) {
+                            const match = msg.content.match(/<thought>([\s\S]*?)<\/thought>/);
+                            if (match) {
+                                thought = match[1].trim();
+                                mainContent = msg.content.replace(/<thought>[\s\S]*?<\/thought>/, '').trim();
+                            }
+                        }
+
+                        return (
                             <div
+                                key={i}
                                 className={cn(
-                                    "flex max-w-[85%] flex-col rounded-2xl px-4 py-3 text-sm shadow-sm",
-                                    msg.role === 'user'
-                                        ? "bg-primary-50 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100 border border-primary-100 dark:border-primary-800"
-                                        : "bg-gray-100 text-gray-800 border border-gray-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700"
+                                    "flex w-full",
+                                    msg.role === 'user' ? "justify-end" : "justify-start"
                                 )}
                             >
-                                <div className="flex items-center mb-1 text-xs opacity-50">
-                                    {msg.role === 'user' ? (
-                                        <User className="w-3 h-3 mr-1" />
-                                    ) : (
-                                        <Bot className="w-3 h-3 mr-1" />
+                                <div
+                                    className={cn(
+                                        "flex max-w-[85%] flex-col rounded-2xl px-4 py-3 text-sm shadow-sm",
+                                        msg.role === 'user'
+                                            ? "bg-primary-50 dark:bg-primary-900/30 text-primary-900 dark:text-primary-100 border border-primary-100 dark:border-primary-800"
+                                            : "bg-gray-100 text-gray-800 border border-gray-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700"
                                     )}
-                                    <span className="font-semibold">{msg.role === 'user' ? 'You' : 'Assistant'}</span>
-                                </div>
+                                >
+                                    <div className="flex items-center mb-1 text-xs opacity-50">
+                                        {msg.role === 'user' ? (
+                                            <User className="w-3 h-3 mr-1" />
+                                        ) : (
+                                            <Bot className="w-3 h-3 mr-1" />
+                                        )}
+                                        <span className="font-semibold">{msg.role === 'user' ? 'You' : 'Assistant'}</span>
+                                    </div>
 
-                                <div className="prose dark:prose-invert prose-sm max-w-none leading-relaxed">
-                                    <ReactMarkdown>{msg.content}</ReactMarkdown>
+                                    {thought && (
+                                        <details className="mb-3 bg-white/50 dark:bg-slate-900/50 rounded-lg border border-black/5 dark:border-white/5 overflow-hidden">
+                                            <summary className="px-3 py-2 text-xs font-medium cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                                View reasoning process
+                                            </summary>
+                                            <div className="px-3 pb-3 pt-1 text-xs text-slate-600 dark:text-slate-400 italic border-t border-black/5 dark:border-white/5 mt-1">
+                                                <ReactMarkdown>{thought}</ReactMarkdown>
+                                            </div>
+                                        </details>
+                                    )}
+
+                                    <div className="prose dark:prose-invert prose-sm max-w-none leading-relaxed">
+                                        <ReactMarkdown>{mainContent}</ReactMarkdown>
+                                    </div>
+
+                                    {msg.role === 'assistant' && msg.citations && msg.citations.length > 0 && (
+                                        <div className="mt-4 pt-3 border-t border-black/5 dark:border-white/5">
+                                            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-2">Sources & References</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {msg.citations.map((cite, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        className="group relative cursor-help"
+                                                    >
+                                                        <span className="inline-flex items-center px-2 py-0.5 rounded bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 text-[10px] font-bold border border-primary-200 dark:border-primary-800 hover:scale-105 transition-transform">
+                                                            P{cite.page_number}
+                                                        </span>
+                                                        <div className="absolute bottom-full left-0 mb-2 w-64 p-3 bg-white dark:bg-slate-900 rounded-lg shadow-xl border border-slate-200 dark:border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                                                            <p className="text-[10px] font-bold text-primary-600 dark:text-primary-400 mb-1">{cite.source_name} - Page {cite.page_number}</p>
+                                                            <p className="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">"{cite.content}"</p>
+                                                            <div className="absolute bottom-[-6px] left-4 w-3 h-3 bg-white dark:bg-slate-900 border-r border-b border-slate-200 dark:border-slate-800 rotate-45" />
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                     {loading && (
                         <div className="flex justify-start w-full">
                             <div className="bg-gray-100 text-gray-900 border border-gray-200 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 rounded-2xl px-4 py-3 flex items-center">

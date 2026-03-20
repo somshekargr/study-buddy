@@ -136,9 +136,25 @@ async def chat_with_document(
         # Yield session ID first
         yield f"__SESSION_ID__:{session_id}\n"
         
-        # Yield Citations
-        citations_json = json.dumps([c["page_number"] for c in context_chunks])
-        print(f"📤 Streaming citations: {citations_json}")
+        # Yield Citations (Enhanced for XAI)
+        citations_data = [
+            {
+                "page_number": c["page_number"],
+                "content": c["content"][:200] + "..." if len(c["content"]) > 200 else c["content"],
+                "source_name": doc.filename if doc else "Web"
+            }
+            for c in context_chunks
+        ]
+        # Also add Web results if any
+        for wr in web_results:
+             citations_data.append({
+                "page_number": "Web",
+                "content": wr.get("content", "")[:200],
+                "source_name": wr.get("title", "Web Result")
+            })
+            
+        citations_json = json.dumps(citations_data)
+        print(f"📤 Streaming enhanced citations: {citations_json}")
         yield f"__CITATIONS__:{citations_json}\n"
         
         async for token in llm_service.stream_chat(messages):
@@ -152,7 +168,7 @@ async def chat_with_document(
                 session_id=session_id,
                 role=MessageRole.ASSISTANT,
                 content=full_response,
-                citations=json.dumps([c["page_number"] for c in context_chunks]) # Use dict access
+                citations=citations_json
             )
             db_final.add(assistant_msg)
             

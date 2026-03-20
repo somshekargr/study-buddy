@@ -20,7 +20,19 @@ class ChatMessageCreate(ChatMessageBase):
 class ChatMessageResponse(ChatMessageBase):
     id: UUID
     session_id: UUID
+    citations: list[dict] | None = None # Change to list of dicts
     created_at: datetime
+
+    @classmethod
+    def from_orm(cls, obj):
+        import json
+        instance = super().from_orm(obj)
+        if isinstance(obj.citations, str) and obj.citations.strip():
+            try:
+                instance.citations = json.loads(obj.citations)
+            except:
+                instance.citations = []
+        return instance
 
     model_config = ConfigDict(from_attributes=True)
 

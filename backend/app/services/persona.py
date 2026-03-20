@@ -92,6 +92,20 @@ Current Date: {datetime.now().strftime("%Y-%m-%d")}
 
 {length_instruction}
 
+EXPLAINABILITY RULE:
+Before providing your final answer, you MUST include a `<thought>` section. 
+In this section, explain your reasoning process:
+1. Which parts of the provided context were most relevant and why.
+2. How the Knowledge Graph facts (if any) helped connect the concepts.
+3. If there is any conflicting or missing information.
+Keep the thinking process concise but transparent.
+
+Example format:
+<thought>
+I found that Page 2 mentions X, and the Knowledge Graph shows X is related to Y. Therefore, I will explain Y in the context of X.
+</thought>
+[Your final answer here]
+
 CONTEXT INFORMATION (Only use if relevant to the question):
 ---
 {context_text}
