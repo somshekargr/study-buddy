@@ -15,12 +15,21 @@ An AI-powered study companion that transforms your PDFs into an interactive lear
 | **🎭 AI Personas** | Choose a tutoring style — Socratic Tutor, Explain Like I'm 5, Strict Professor, and more |
 | **📝 Quiz Generation** | Instantly generate interactive multiple-choice quizzes from your study material |
 | **📍 Citation Tracking** | Every answer includes source citations with page references |
+| **🧠 Explainable AI (XAI)** | View the assistant's reasoning trace and source-linked snippets |
 | **🔗 Knowledge Graphs** | Neo4j-powered knowledge maps linking concepts across documents |
 | **👁️ Vision Analysis** | OCR and image analysis for scanned PDFs using Ollama vision models |
 | **📧 Email Notifications** | Get notified when document processing completes |
 | **🔐 Secure Auth** | Google OAuth 2.0 + JWT authentication |
 | **🌙 Dark Mode** | Full light/dark/system theme support |
 | **📱 Responsive** | Mobile-optimized UI with adaptive layouts |
+
+---
+
+### 🧠 Explainable AI (XAI)
+Study Buddy doesn't just give you answers; it explains how it got there.
+- **Reasoning Trace**: View the step-by-step thinking process of the AI.
+- **Rich Citations**: Hover over references to see exact text snippets from your documents.
+- **Graph Connection**: Understand how concepts are linked via the integrated Knowledge Graph.
 
 ---
 
